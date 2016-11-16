@@ -1,3 +1,4 @@
 #!/bin/bash
-g++ secant.cpp -o secant
-./secant
+FILENAME=$1
+g++ $FILENAME.cpp -o $FILENAME.out
+./$FILENAME.out
