@@ -5,10 +5,13 @@
 <p>
   I have designed each method independently from other
   So, you can run the file by...
+<br>
+<br>
 <code>
-  g++ <filename>.cpp -o <filename>
+  g++ filename.cpp -o filename
 </code>
+<br>
 <code>
-  ./<filename>
+  ./filename
 </code>
 </p>
