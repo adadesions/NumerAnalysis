@@ -8,10 +8,10 @@
 <br>
 <br>
 <code>
-  g++ filename.cpp -o filename
+  g++ filename.cpp -o filename.out
 </code>
 <br>
 <code>
-  ./filename
+  ./filename.out
 </code>
 </p>
