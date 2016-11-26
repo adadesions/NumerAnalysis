@@ -1,3 +1,4 @@
 #!/bin/bash
-g++ $1 -o $1.o
-./$1.o
+FILENAME=$1
+g++ $FILENAME -o $FILENAME.o 
+./$FILENAME.o
