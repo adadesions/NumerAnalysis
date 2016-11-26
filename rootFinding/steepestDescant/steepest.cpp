@@ -123,12 +123,6 @@ int main ()
 	u = u_vector(x0,2);
 	index = 0;
 	
-	if( resultFile.is_open() )
-		cout << "Opned";
-	else
-		cout << "Fix";
-
-
 	printf("-------------------------------------------------\n");	
 	printf("|\tIndex\t|\tt\t|\tf(x1)\t|\n");
 	printf("-------------------------------------------------\n");	
