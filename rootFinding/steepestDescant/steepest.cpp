@@ -28,9 +28,9 @@ double f(double x[], int n);
 double partial(double x[], int pos);
 double grad(double x[], int n);
 double norm(double x[], int n);
-double * u_vector(double x[], int n)
-double * cal_x1(double x[], double *u, int n, double t)
-double steepest(double x[], double *u, int n, double t)
+double * u_vector(double x[], int n);
+double * cal_x1(double x[], double *u, int n, double t);
+double steepest(double x[], double *u, int n, double t);
 
 double f(double x[], int n)
 {
