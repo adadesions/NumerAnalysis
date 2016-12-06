@@ -14,4 +14,10 @@
 <code>
   ./filename.out
 </code>
+<h2>
+  Alternative,
+</h2>
+<code>
+    ./cmp.sh <dir>/<filename>.cpp
+</code>
 </p>
