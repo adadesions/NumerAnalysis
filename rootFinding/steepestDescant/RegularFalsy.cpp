@@ -31,6 +31,8 @@ double norm(double x[], int n);
 double * u_vector(double x[], int n);
 double * cal_x1(double x[], double *u, int n, double t);
 double steepest(double x[], double *u, int n, double t);
+double phi_prime(double t, int n);
+double regularFalsi(double t[], int n)
 
 double f(double x[], int n)
 {
