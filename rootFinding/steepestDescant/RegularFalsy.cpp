@@ -1,9 +1,9 @@
 /*
  * =====================================================================================
  *
- *       Filename:  steepest.cpp
+ *       Filename:  RegularFalsy.cpp
  *
- *    Description:  Root finding implement by steepest descant method
+ *    Description: Line search by RegularFalsy Method 
  *
  *        Version:  1.0
  *        Created:  11/25/16 00:13:35
@@ -57,6 +57,19 @@ double partial(double x[], int pos, int n)
 	return (f(temp,n)-f(x,n))/h;
 }
 
+double grad(double x[], int n)
+{
+	double sum;
+	int i;
+	sum = 0;
+	
+	for(i=0;i<n;i++)
+	{
+		sum = sum + partial(x,i,n);
+	}
+	return sum;
+}
+
 double norm(double x[], int n)
 {
 	double p[n], sum;
@@ -106,56 +119,57 @@ double steepest(double x[], double *u, int n, double t)
 	return f(x1, n);
 }
 
-double goldenSec(double min, double max, int n)
+double phi_prime(double t, int n)
+{
+	double x0[] = {2, 3};
+	double *u, *x1, result, my_norm;
+	int i;
+	result = 0;
+	u = u_vector(x0,n);
+	x1 = cal_x1(x0, u, n, t);
+	for(i=0;i<n;i++)
+	{
+		result = result+(*(u+i)*partial(x1,i,n));
+	}
+	return result;
+}
+double regularFalsi(double t[], int n)
 {
 	const double esp = 0.001;
-	const double ratio = 1.618;
-	double x0[] = {2, 3};
-	double differRatio, t[n], *u;
-	double phi_0, phi_1;
-	bool halt_check1, halt_check2;
+	double firstTerm, secondTerm, t_new, phi_0, phi_1, phi_2;
+	phi_0 = phi_prime(t[0],n);
+	phi_1 = phi_prime(t[1],n);
+	firstTerm = t[1];
+	secondTerm = phi_1*((t[1]-t[0])/(phi_1-phi_0));	
 
-	differRatio = (max - min)/ratio;
-	t[0] = max - differRatio;
-	t[1] = min + differRatio;
+	// Cal t(k+1) as t_new
+	t_new = firstTerm-secondTerm;
+	phi_2 = phi_prime(t_new,n);
 	
-	u = u_vector(x0,n);
-	phi_0 = steepest(x0, u, n, t[0]);
-	phi_1 = steepest(x0, u, n, t[1]);
-	halt_check1 = abs(max-min) < esp;
-	halt_check2 = abs(phi_1-phi_0) < esp;
+	// Display Value
+	printf("%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t\n",t[0],t[1],t_new,phi_1,phi_2);
+	//HALT CASE
+	if(phi_2 < esp)
+		return t_new;
 
-	printf("%.3f\t%.3f\t%.3f\t%.3f\t", max,min,t[0],t[1]);
-	printf("%.3f\t%.3f\t%.3f\t%.3f\n", phi_0, phi_1,abs(max-min),abs(phi_1-phi_0));
+	//Assign New Value
+	if(phi_1*phi_2 > 0)
+		t[1] = t_new;
+	else if( phi_1*phi_2 < 0 )
+		t[0] = t_new;
 
-	if( halt_check1 )
-	{	
-		cout << "HALT At t0: " << t[0] << endl;
-		cout << "HALT At t1: " << t[1] << endl;
-		return t[0];
-	}
-	else if( halt_check2 )
-	{
-		cout << "HALT At t0: " << t[0] << endl;
-		cout << "HALT At t1: " << t[1] << endl;
-		return t[0];
-	}
-	
-
-	if( phi_0 > phi_1 )
-		min = t[0];
-	else if( phi_0 < phi_1 )
-		max = t[1];
-	goldenSec(min, max, n);
+	regularFalsi(t, n);
 }
+
 
 int main ()
 {
-	double *u, *x1, *t, result;
-	int n, i;
+	int n;
+	double t[] = {3,5}, t_star;
 	n = 2;
-	printf("Max\tMin\tt[0]\tt[1]\tphi_0\tphi_1\tAbsMM\tAbsPhi\n");
-	goldenSec(0,5,n);	
+	printf("t(k-1)\tt(k)\tt(k+1)\tphi(k)\tphi(k+1)\n");
+	t_star = regularFalsi(t,n);
+	cout << "Answer : " << t_star << endl;
 	return 0;
 }
 
