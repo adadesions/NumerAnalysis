@@ -17,9 +17,7 @@
 
 #include <iostream>
 #include <cmath>
-#include <fstream>
 #include <string>
-#include <iomanip>
 #include "stdio.h"
 
 using namespace std;
