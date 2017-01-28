@@ -66,14 +66,15 @@ adavector multiplyVector(adavector a, adavector b){
     for(int i=0; i<dim1[0]; i++)
       result[i].resize(dim2[1]);
 
-    int rows, cols, curCol;
+    int rows, cols, inter;
     rows = result.size();
     cols = result[0].size();
+    inter = dim1[1];
 
     for(int i=0; i<rows; i++){
       for(int j=0; j<cols; j++){
         double temp = 0;
-        for(int k=0; k<rows; k++){
+        for(int k=0; k<inter; k++){
           temp += a[i][k]*b[k][j];
         }
         result[i][j] = temp;
@@ -121,6 +122,29 @@ adavector subtractVector(adavector a, adavector b){
   return operationVector(false, a, b);
 }
 
+adavector scalarVector(bool operation, double s, adavector v){
+  int rows, cols;
+  rows = v.size();
+  cols = v[0].size();
+  for(int i=0; i<rows; i++){
+    for(int j=0; j<cols; j++){
+      if(operation)
+        v[i][j] = s*v[i][j];
+      else
+        v[i][j] = v[i][j]/s;
+    }
+  }
+  return v;
+}
+
+adavector scalarMulVector(double s, adavector v){
+  return scalarVector(true, s, v);
+}
+
+adavector scalarDivVector(double s, adavector v){
+  return scalarVector(false, s, v);
+}
+
 void dispVector(adavector v, string dispName){
   int rows, cols;
   rows = v.size();
@@ -135,18 +159,75 @@ void dispVector(adavector v, string dispName){
   printf("\n");
 }
 
+adavector transpose(adavector v){
+  adavector t;
+  int rows,cols;
+  rows = v.size();
+  cols = v[0].size();
+  t.resize(cols);
+  for(int i=0; i<rows; i++){
+    t[i].resize(rows);
+  }
+  rows = t.size();
+  cols = t[0].size();
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      t[i][j] = v[j][i];
+    }
+  }
+  return t;
+}
+
+adavector cal_B(adavector b, adavector y, adavector dx, double alpha){
+  double yts, stbs;
+  adavector yt(transpose(y));
+  adavector s(scalarMulVector(alpha, dx));
+  adavector st(transpose(s));
+  adavector bs(multiplyVector(b, s));
+  adavector btst(transpose(bs));
+  adavector stb(multiplyVector(st, b));
+  adavector result(b);
+  adavector yyt(multiplyVector(y, yt));
+  adavector bsbtst(multiplyVector(bs, btst));
+
+  dispVector(yyt, "yyt");
+  dispVector(bsbtst, "bsbtst");
+
+  yts = multiplyVector(yt , s)[0][0];
+  stbs = multiplyVector(stb, s)[0][0];
+  yyt = scalarDivVector(yts, yyt);
+  bsbtst = scalarDivVector(stbs, bsbtst);
+
+
+  printf("yts = %.2f\n", yts);
+  dispVector(yyt, "yyt/yts");
+
+  printf("stbs = %.2f\n", stbs);
+  dispVector(bsbtst, "bsbtst/stbs");
+
+  result = subtractVector(yyt, bsbtst);
+  b = addVector(b, result);
+  dispVector(b, "New B");
+
+  return b;
+}
+
 int main(){
+  double alpha = 0.1;
   adavector x0 {{1}, {2}};
   adavector b0 {{x0[0][0], 0}, {0, x0[1][0]}};
   adavector ib0(inverseVector(b0));
   adavector gf(grad(x0));
-  adavector x1;
-  double alpha = 0.1;
+  adavector dx0(multiplyVector(ib0, gf));
+  adavector x1, y0;
 
-  dispVector(ib0,"ib0");
-  dispVector(gf, "gradient");
-  dispVector(multiplyVector(ib0, gf), "delta x0");
-  dispVector(subtractVector(b0, ib0), "Subtract 2b0");
+  x1 = subtractVector(x0,scalarMulVector(alpha, dx0));
+  y0 = subtractVector(grad(x1), gf);
+  dispVector(x0, "x0");
+  dispVector(scalarMulVector(alpha, dx0), "alpha*dx0");
+  dispVector(x1, "x1");
+  dispVector(y0, "y0");
+  cal_B(b0, y0, dx0, alpha);
 
   return 0;
 }
