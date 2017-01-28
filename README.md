@@ -5,6 +5,7 @@
 <ul>
   <li>1. Steepest Descant</li>
   <li>2. Conjugate Gradient</li>
+  <li>3. Levenberg-Marquordt</li>
 </ul>
 <h2>Line Search Methods</h2>
 <ul>
