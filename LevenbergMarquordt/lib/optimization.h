@@ -28,4 +28,27 @@ adavector BFGS(adavector b, adavector y, adavector dx, double alpha){
   return addVector(result,b);
 }
 
-// adavector DFP(adavector b, adavector y, adavector dx, double alpha){}
+adavector DFP(adavector b, adavector y, adavector dx){
+  // Init
+  adavector I {{1,0},{0,1}};
+  adavector yt(transpose(y));
+  adavector dxt(transpose(dx));
+  adavector first, second, third;
+  adavector result(I);
+  double ytdx(multiplyVector(yt, dx)[0][0]);
+
+  //Computation
+  //First Term
+  first = scalarDivVector(ytdx, multiplyVector(y, dxt));
+  first = subtractVector(I, first);
+  //Second Term
+  second = scalarDivVector(ytdx, multiplyVector(dx, yt));
+  second  = subtractVector(I, second);
+  //Third Term
+  third = scalarDivVector(ytdx, multiplyVector(y, yt));
+
+  //Merge for Result
+  result = multiplyVector(multiplyVector(first, b), second);
+  result = addVector(result, third);
+  return result;
+}

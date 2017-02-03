@@ -37,8 +37,10 @@ adavector grad(adavector x){
   return result;
 }
 
-adavector cal_B(adavector b, adavector y, adavector dx, double alpha){
-  return BFGS(b, y, dx, alpha);
+adavector cal_B(adavector b, adavector y, adavector dx, double alpha, int gramma){
+  adavector fBFGS(scalarMulVector(1-gramma, BFGS(b, y, dx, alpha)));
+  adavector fDFP(scalarMulVector(gramma, DFP(b, y, dx)));
+  return addVector(fBFGS, fDFP);
 }
 
 adavector LM(adavector b,adavector x1, double lambda){
@@ -50,7 +52,7 @@ adavector LM(adavector b,adavector x1, double lambda){
   adavector dx = multiplyVector(inverseVector(b), grad(x1));
   adavector x2 = subtractVector(x1, scalarMulVector(alpha, dx));
   adavector y = subtractVector(grad(x2), grad(x1));
-  adavector B(cal_B(b,y,dx,alpha)); // Bk+1
+  adavector B(cal_B(b,y,dx,alpha,(int)norm(y)%2)); // Bk+1
   adavector DB(diagonal(B)); // Diagonal of B
   DB = scalarMulVector(lambda, DB); // Multiply lambda with Diagonal B
   adavector IDB = inverseVector(addVector(B, DB)); // Inverse DB
@@ -75,7 +77,7 @@ adavector QN(adavector b, adavector x1, double alpha){
   adavector x_new = subtractVector(x1, scalarMulVector(alpha, dx));
   adavector gf2 = grad(x_new);
   adavector y = subtractVector(gf2, gf1);
-  adavector b_new = cal_B(b, y, dx, alpha);
+  adavector b_new = cal_B(b, y, dx, alpha, (int)norm(y)%2);
   printf("f_new, f_old : %.2f %.2f\n", f(x_new), f(x1));
   printf("diff = %.2f\n", f(x_new)-f(x1));
   printf("Dx = %f\n", norm(dx));
@@ -90,8 +92,7 @@ adavector QN(adavector b, adavector x1, double alpha){
 
 int main(){
   double lambda = 0.001;
-  adavector x0 {{4}, {2}};
-  adavector x00 {{12.3}, {100}};
+  adavector x0 {{2}, {1}};  
   adavector b0 {{x0[0][0], 0}, {0, x0[1][0]}};
   dispVector(LM(b0, x0, lambda), "LM - x*");
   return 0;
