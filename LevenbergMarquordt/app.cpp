@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
-#include "./lib/adavector.hpp"
+#include "./lib/adalib.h"
+#include "./lib/optimization.h"
 
 using namespace std;
+using namespace adalib;
 
 #define VNAME(x) cout << #x << " = " << endl;
 
@@ -35,36 +37,8 @@ adavector grad(adavector x){
   return result;
 }
 
-
-adavector bfgsMethod(adavector b, adavector y, adavector dx, double alpha){
-  double yts, stbs;
-  adavector yt(transpose(y));
-  adavector s(scalarMulVector(alpha, dx));
-  adavector st(transpose(s));
-  adavector bs(multiplyVector(b, s));
-  adavector btst(transpose(bs));
-  adavector stb(multiplyVector(st, b));
-  adavector result(b);
-  adavector yyt(multiplyVector(y, yt));
-  adavector bsbtst(multiplyVector(bs, btst));
-
-  yts = multiplyVector(yt , s)[0][0];
-  stbs = multiplyVector(stb, s)[0][0];
-  yyt = scalarDivVector(yts, yyt);
-  bsbtst = scalarDivVector(stbs, bsbtst);
-  result = subtractVector(yyt, bsbtst);
-
-  //DEBUG ZONE
-  // dispVector(yyt, "Debug yyt");
-  // dispVector(bsbtst, "Debug bsbtst");
-  // dispVector(result, "Before add B0");
-  // dispVector(addVector(result,b), "added B0");
-  //END DEBUG ZONE
-  return addVector(result,b);
-}
-
 adavector cal_B(adavector b, adavector y, adavector dx, double alpha){
-  return bfgsMethod(b, y, dx, alpha);
+  return BFGS(b, y, dx, alpha);
 }
 
 adavector LM(adavector b,adavector x1, double lambda){
@@ -115,12 +89,10 @@ adavector QN(adavector b, adavector x1, double alpha){
 }
 
 int main(){
-  double lambda = 10;
-  adavector x0 {{2}, {2}};
-  adavector x00 {{5}, {8}};
+  double lambda = 0.001;
+  adavector x0 {{4}, {2}};
+  adavector x00 {{12.3}, {100}};
   adavector b0 {{x0[0][0], 0}, {0, x0[1][0]}};
-  // dispVector(QN(b0,x0,1), "QN - x*");
-  dispVector(LM(b0, x00, lambda), "LM - x*");
-  // dispVector(LM(b0, x0, lambda, 0.000001), "x*");
+  dispVector(LM(b0, x0, lambda), "LM - x*");
   return 0;
 }
